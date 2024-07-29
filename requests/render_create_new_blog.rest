@@ -1,0 +1,9 @@
+POST http://bloglist-7lof.onrender.com/api/blogs
+Content-Type: application/json
+
+{
+  "title": "New blog 2",
+  "author": "New author 2",
+  "url": "http://newblog2.com",
+  "likes": 0
+}
