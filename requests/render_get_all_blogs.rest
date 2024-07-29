@@ -1,1 +1,1 @@
-GET http://bloglist-7lof.onrender.com/api/blogs
+GET http://bloglist-7lof.onrender.com/api/bloglist
