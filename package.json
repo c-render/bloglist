@@ -1,0 +1,25 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "backend is the ultimate backend solution",
+    "main": "index.js",
+    "scripts": {
+        "setup": "npm install && npm update",
+        "start": "node index.js",
+	"dev": "nodemon index.js"
+    },
+    "keywords": [
+        "express",
+        "backend"
+    ],
+    "license": "MIT",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.19.2",
+        "mongoose": "^8.5.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.4"
+    }
+}
