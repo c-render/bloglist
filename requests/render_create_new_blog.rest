@@ -1,4 +1,4 @@
-POST http://bloglist-7lof.onrender.com/api/bloglist
+POST http://bloglist-7lof.onrender.com/api/blogs
 Content-Type: application/json
 
 {

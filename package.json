@@ -5,8 +5,10 @@
     "main": "index.js",
     "scripts": {
         "setup": "npm install && npm update",
-        "start": "node index.js",
-	"dev": "nodemon index.js"
+        "start": "cross-env NODE_ENV=production node index.js",
+        "dev": "cross-env NODE_ENV=development nodemon index.js",
+        "run_test": "cross-env NODE_ENV=test nodemon index.js",
+        "test": "cross-env NODE_ENV=test node --test"
     },
     "keywords": [
         "express",
@@ -15,11 +17,14 @@
     "license": "MIT",
     "dependencies": {
         "cors": "^2.8.5",
+        "cross-env": "^7.0.3",
         "dotenv": "^16.4.5",
         "express": "^4.19.2",
+        "express-async-errors": "^3.1.1",
         "mongoose": "^8.5.1"
     },
     "devDependencies": {
-        "nodemon": "^3.1.4"
+        "nodemon": "^3.1.4",
+        "supertest": "^7.0.0"
     }
 }

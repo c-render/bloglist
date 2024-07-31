@@ -1,5 +1,6 @@
 const config = require('./utils/config')
 const express = require('express')
+require('express-async-errors')
 const app = express()
 const cors = require('cors')
 const bloglistRouter = require('./controllers/bloglists')
@@ -23,7 +24,7 @@ app.use(cors())
 app.use(express.json())
 app.use(middleware.requestLogger)
 
-app.use('/api/bloglist', bloglistRouter)
+app.use('/api/blogs', bloglistRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)

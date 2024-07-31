@@ -1,3 +1,4 @@
+require('dotenv').config()
 const mongoose = require('mongoose')
 
 const blogSchema = new mongoose.Schema({
@@ -26,4 +27,8 @@ blogSchema.set('toJSON', {
   }
 })
 
-module.exports = mongoose.model('Blog', blogSchema)
+if (process.env.NODE_ENV !== 'test') {
+  module.exports = mongoose.model('Blog', blogSchema)
+} else {
+  module.exports = mongoose.model('TestBlog', blogSchema)
+}
