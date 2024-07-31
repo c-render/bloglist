@@ -8,11 +8,6 @@ const api = supertest(app)
 
 const Blog = require('../models/blog')
 
-const initialBlogs = [
-  { title: 'New blog', author: 'John Doe', url: 'http://example.com', likes: 0 },
-  { title: 'Another blog', author: 'Jane Doe', url: 'http://example.com', likes: 0 }
-]
-
 beforeEach(async () => {
   await Blog.deleteMany({})
   //console.log('cleared')
@@ -124,6 +119,25 @@ test('a blog can be deleted', async () => {
   assert(!titles.includes(blogToDelete.title))
 
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+})
+
+test('likes for a blog can be incremented', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToChange = blogsAtStart[0]
+  //console.log(blogToChange)
+
+  const updatedBlog = { ...blogToChange, likes: blogToChange.likes + 1 }
+  //console.log(updatedBlog)
+  
+  await api
+    .put(`/api/blogs/${blogToChange.id}`)
+    .send(updatedBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  assert.strictEqual(blogsAtStart[0].likes + 1, blogsAtEnd[0].likes)
 })
 
 after(async () => {
