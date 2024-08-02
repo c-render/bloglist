@@ -8,9 +8,19 @@ const api = supertest(app)
 
 const Blog = require('../models/blog')
 
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
+
 beforeEach(async () => {
+  // Create a user to be able to test
+  //await User.deleteMany({})
+  //console.log('users cleared')
+  //const passwordHash = await bcrypt.hash('sekret', 10)
+  //const user = new User({ username: 'root', name: 'Superuser', passwordHash })
+  //const savedUser = await user.save()
+  //console.log('root user created')
+
   await Blog.deleteMany({})
-  //console.log('cleared')
 
   // *** forEach method fails, because tests start during single forEach ***
   //helper.initialBlogs.forEach(async (blog) => {
@@ -28,42 +38,51 @@ beforeEach(async () => {
 
   // *** for...of method (order defined) ***
   for (let blog of helper.initialBlogs) {
+    //blog = {...blog, user: savedUser.id}
     let blogObject = new Blog(blog)
     await blogObject.save()
-    //console.log('saved')
   }
   
-  //console.log('done')
 })
 
-test('notes are returned as json', async () => {
+test('blogs are returned as json', async () => {
+  const token = await helper.initialUserToken()
   await api
     .get('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 })
 
 test('all blogs are returned', async () => {
-  const response = await api.get('/api/blogs')
+  const token = await helper.initialUserToken()
+  const response = await api
+    .get('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
 
   assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
 test('the first blog is a new blog', async () => {
-  const response = await api.get('/api/blogs')
-  //console.log(response.body)
+  const token = await helper.initialUserToken()
+  const response = await api
+    .get('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+
   const titles = response.body.map(e => e.title)
-  //console.log(titles)
-  //console.log(titles.includes('New blog'))
-  //assert.strictEqual(titles.includes('New blog'), true)
+
   assert(titles.includes('New blog'))
 })
 
 test('a valid blog can be added ', async () => {
-  const newBlog = { title: 'Yet another blog', author: 'Willy Doe', url: 'http://example.com', likes: 0 }
+
+  const token = await helper.initialUserToken()
+
+  const newBlog = { title: 'Yet another blog', author: 'Willy Doe', url: 'http://example.com', likes: 0}
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -71,18 +90,22 @@ test('a valid blog can be added ', async () => {
   const blogsAtEnd = await helper.blogsInDb()
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
 
- 
   const titles = blogsAtEnd.map(r => r.title)
   assert(titles.includes('Yet another blog'))
 })
 
 test('blog without content is not added', async () => {
+
+  const token = await helper.initialUserToken()
+
   const newBlog = {
-    likes: 0
+    likes: 0,
+    // user: user.id
   }
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(400)
 
@@ -95,10 +118,12 @@ test('a specific blog can be viewed', async () => {
   const blogsAtStart = await helper.blogsInDb()
 
   const blogToView = blogsAtStart[0]
-  //console.log(blogToView)
+
+  const token = await helper.initialUserToken()
 
   const resultBlog = await api
     .get(`/api/blogs/${blogToView.id}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -108,9 +133,12 @@ test('a specific blog can be viewed', async () => {
 test('a blog can be deleted', async () => {
   const blogsAtStart = await helper.blogsInDb()
   const blogToDelete = blogsAtStart[0]
+  
+  const token = await helper.initialUserToken()
 
   await api
     .delete(`/api/blogs/${blogToDelete.id}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(204)
 
   const blogsAtEnd = await helper.blogsInDb()
@@ -124,13 +152,14 @@ test('a blog can be deleted', async () => {
 test('likes for a blog can be incremented', async () => {
   const blogsAtStart = await helper.blogsInDb()
   const blogToChange = blogsAtStart[0]
-  //console.log(blogToChange)
 
   const updatedBlog = { ...blogToChange, likes: blogToChange.likes + 1 }
-  //console.log(updatedBlog)
   
+  const token = await helper.initialUserToken()
+
   await api
     .put(`/api/blogs/${blogToChange.id}`)
+    .set('Authorization', `Bearer ${token}`)
     .send(updatedBlog)
     .expect(200)
     .expect('Content-Type', /application\/json/)
